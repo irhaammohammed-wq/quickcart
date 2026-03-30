@@ -1,25 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "./components/Header";
-import ProductList from "./components/ProductList";
-import Cart from "./components/Cart";
-import products from "./data/products";
+import { Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import CartPage from "./pages/CartPage";
 
 function App() {
-  const [cart, setCart] = useState([]);
-  const [showCart, setShowCart] = useState(false);
+  // Load cart from localStorage
+  const [cart, setCart] = useState(() => {
+    const savedCart = localStorage.getItem("cart");
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
+
+  // Save cart to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
 
   return (
     <div>
       {/* Header */}
-      <Header cart={cart} setShowCart={setShowCart} />
+      <Header cart={cart} />
 
-      {/* Product List */}
-      <ProductList products={products} cart={cart} setCart={setCart} />
-
-      {/* Cart Sidebar */}
-      {showCart && (
-        <Cart cart={cart} setCart={setCart} setShowCart={setShowCart} />
-      )}
+      {/* Routes */}
+      <Routes>
+        <Route path="/" element={<Home cart={cart} setCart={setCart} />} />
+        <Route
+          path="/cart"
+          element={<CartPage cart={cart} setCart={setCart} />}
+        />
+      </Routes>
     </div>
   );
 }
